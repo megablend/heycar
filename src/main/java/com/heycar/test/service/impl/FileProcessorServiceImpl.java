@@ -59,7 +59,7 @@ public class FileProcessorServiceImpl implements FileProcessorService {
                     continue;
                 
                 // validate the records provided
-                Listing listing = getListing(record, provider);
+                Listing listing = getListing(record);
                 Set<ConstraintViolation<Listing>> violations = validator.validate(listing);
                 if (!violations.isEmpty())
                     throw new ConstraintViolationException(violations);
@@ -67,7 +67,7 @@ public class FileProcessorServiceImpl implements FileProcessorService {
             }
             
             // save all records
-            listingService.saveAll(listings);
+            listingService.saveListing(provider, listings);
         }
     }
     
