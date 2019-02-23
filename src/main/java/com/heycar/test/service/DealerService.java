@@ -3,22 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.heycar.test.response;
+package com.heycar.test.service;
+
+import com.heycar.test.models.Dealer;
 
 /**
  *
  * @author Megafu Charles <noniboycharsy@gmail.com>
  */
-public abstract class Response {
+public interface DealerService {
     /**
-     * The response code for a request
+     * Get dealer by ID
+     * @param id
      * @return 
      */
-    public abstract String getResponseCode();
-    
-    /**
-     * Gets the payload of the response
-     * @return 
-     */
-    public abstract Object getResponseMessage();
+    Dealer findDealerById(Long id);
 }

@@ -12,18 +12,14 @@ import lombok.AllArgsConstructor;
  * @author Megafu Charles <noniboycharsy@gmail.com>
  */
 @AllArgsConstructor
-public class ApiResponse extends Response {
+public class ApiResponseFactory implements ResponseAbstractFactory {
+
     private final String responseCode;
     private final Object responseMessage;
-
+    
     @Override
-    public Object getResponseMessage() {
-        return responseMessage;
-    }
-
-    @Override
-    public String getResponseCode() {
-        return responseCode;
+    public Response createResponse() {
+        return new ApiResponse(responseCode, responseMessage);
     }
     
 }

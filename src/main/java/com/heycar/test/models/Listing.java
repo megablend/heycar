@@ -69,7 +69,7 @@ public class Listing implements Serializable {
     
     @Min(value = 1, message = "The power in PS must not be less than one (1)")
     @Column(name = "power_in_ps", length = 10)
-    private int powerInPs;
+    private int kw;
     
     @Pattern(regexp = "^\\d{4}$", message = "Please provide a valid year")
     @Column(name = "model_year", length = 4)
@@ -98,5 +98,7 @@ public class Listing implements Serializable {
     @PrePersist
     public void updateDate() {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
+        if (null == createdAt)
+            this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 }

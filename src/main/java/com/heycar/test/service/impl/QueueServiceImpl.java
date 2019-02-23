@@ -6,12 +6,20 @@
 package com.heycar.test.service.impl;
 
 import com.heycar.test.config.ApplicationProperties;
+import com.heycar.test.dto.ListingRequest;
+import com.heycar.test.models.Dealer;
+import com.heycar.test.models.Provider;
+import com.heycar.test.service.DealerService;
+import com.heycar.test.service.ListingService;
+import com.heycar.test.service.ProviderService;
 import com.heycar.test.service.QueueService;
+import com.heycar.test.util.Util;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ScheduledMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +33,17 @@ public class QueueServiceImpl implements QueueService {
     
     private final JmsTemplate jmsTemplate;
     private final ApplicationProperties properties;
+    private final ListingService listingService;
+    private final ProviderService providerService;
+    private final DealerService dealerService;
     
     @Autowired
-    public QueueServiceImpl(JmsTemplate jmsTemplate, ApplicationProperties properties) {
+    public QueueServiceImpl(JmsTemplate jmsTemplate, ApplicationProperties properties, ListingService listingService, ProviderService providerService, DealerService dealerService) {
         this.jmsTemplate = jmsTemplate;
         this.properties = properties;
+        this.listingService = listingService;
+        this.providerService = providerService;
+        this.dealerService = dealerService;
     }
 
     /** {@inheritDoc} */
@@ -41,6 +55,17 @@ public class QueueServiceImpl implements QueueService {
             textMessage.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, properties.getActivemqMessageDeliveryRetrial() * 60 * 1000); // failed message delivery will repeat within the specified minutes configured
             return textMessage;
         });
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @JmsListener(destination = "${heycar.activemq-save-listing-topic}", containerFactory = "containerFactory")
+    public void saveListings(String payload) {
+        ListingRequest request = Util.convertStringToObject(payload, ListingRequest.class);
+        Dealer dealer = dealerService.findDealerById(request.getDealer());
+        Provider provider = providerService.getByProviderNameAndDealer(dealer, request.getProvider());
+        // save or update listing
+        listingService.saveListing(provider, request.getListings());
     }
     
 }

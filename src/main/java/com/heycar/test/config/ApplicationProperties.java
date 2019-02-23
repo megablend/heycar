@@ -92,4 +92,9 @@ public class ApplicationProperties {
      */
     @NotBlank
     private String activemqSaveListingTopic = "dealersListing";
+    
+    /**
+     * The maximum allowable number of listings
+     */
+    private int maximumNumberOfListings = 100;
 }

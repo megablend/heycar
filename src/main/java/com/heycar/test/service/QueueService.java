@@ -16,4 +16,10 @@ public interface QueueService {
      * @param payload 
      */
     void sendToTopic(String topic, String payload);
+    
+    /**
+     * Saves a provider's listings
+     * @param payload 
+     */
+    void saveListings(String payload);
 }
