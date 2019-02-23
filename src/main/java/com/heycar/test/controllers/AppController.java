@@ -9,13 +9,16 @@ import com.heycar.test.config.ApplicationProperties;
 import com.heycar.test.dto.ListingRequest;
 import com.heycar.test.dto.Responses;
 import com.heycar.test.models.Dealer;
+import com.heycar.test.models.Provider;
 import com.heycar.test.response.ApiResponseFactory;
 import com.heycar.test.response.ResponseFactory;
 import com.heycar.test.service.DealerService;
+import com.heycar.test.service.FileProcessorService;
 import com.heycar.test.service.ListingService;
 import com.heycar.test.service.ProviderService;
 import com.heycar.test.service.QueueService;
 import com.heycar.test.util.Util;
+import static com.heycar.test.util.Util.validFileExtension;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
@@ -28,7 +31,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -51,10 +56,31 @@ public class AppController {
     @Autowired
     private ListingService listingService;
     
+    @Autowired
+    private FileProcessorService fileProcessorService;
+    
     @PostMapping("/upload_csv/{dealerId}")
     @ApiOperation(value = "Upload Listing in CSV Format", notes = "This endpoint manages the upload of listings by providers in CSV format", nickname = "Upload Vehicle Listings in CSV")
-    public ResponseEntity uploadCsv(@PathVariable @Min(value = 1, message = "Dealer ID must not be less than one (1)") Long dealerId) {
-        return null;
+    public ResponseEntity uploadCsv(@PathVariable @Min(value = 1, message = "Dealer ID must not be less than one (1)") Long dealerId, 
+                                    @RequestParam("file") MultipartFile file, @RequestParam("provider") String providerName) throws Exception {
+        // do some validation checks
+        if (null == file || file.isEmpty() || null == file.getOriginalFilename() || file.getOriginalFilename().trim().isEmpty()) 
+            return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.NO_FILE_UPLOADED, "Please upload a CSV file")));
+        
+        if (!validFileExtension(file))
+            return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.NO_FILE_UPLOADED, "Please upload a CSV file")));
+        
+        // check if this provider and dealer exists
+        Dealer dealer = dealerService.findDealerById(dealerId);
+        if (null == dealer)
+            return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.DEALER_DOES_NOT_EXIST, "This dealer does not exist")));
+        
+        Provider provider = providerService.getByProviderNameAndDealer(dealer, providerName);
+        if (null == provider)
+            return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.PROVIDER_DOES_NOT_EXIST, new StringBuilder("This provider does not exist for ").append(dealer.getName()).toString())));
+        
+        fileProcessorService.processFile(file.getInputStream(), provider);
+        return ResponseEntity.ok(ResponseFactory.createResponse(new ApiResponseFactory(Responses.SUCCESS,"Listings successfully uploaded")));
     }
     
     /**

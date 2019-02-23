@@ -49,7 +49,7 @@ public class ListingServiceImpl implements ListingService {
                     listingsToSave.add(updateListing(listing, l));
                 }
             });
-            listingRepo.saveAll(listingsToSave); // save all at once
+            saveAll(listingsToSave); // save all at once
         } catch (Exception e) {
             log.error("An exception occurred while trying to save listing", e);
         }
@@ -79,9 +79,16 @@ public class ListingServiceImpl implements ListingService {
         return listing;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Listing> getAllListings() {
         return listingRepo.findAll();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void saveAll(List<Listing> listings) {
+        listingRepo.saveAll(listings);
     }
     
 }

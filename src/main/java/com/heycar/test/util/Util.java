@@ -7,8 +7,14 @@ package com.heycar.test.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.heycar.test.models.Listing;
+import com.heycar.test.models.Provider;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -16,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public final class Util {
+    
+    private final static Pattern CODE_PATTERN = Pattern.compile("(code.*)",Pattern.CASE_INSENSITIVE);
+    private final static Pattern YEAR_PATTERN = Pattern.compile("(year.*)",Pattern.CASE_INSENSITIVE);
     
     private Util() {} // prevent this class from being initialized
     
@@ -51,5 +60,38 @@ public final class Util {
             log.error("Unable to parse json string {}", data, e);
         }
         return null;
+    }
+    
+    /**
+     * Validates the header for a CSV
+     * @param record
+     * @return 
+     */
+    public static boolean isHeaderRow(CSVRecord record) {
+        return CODE_PATTERN.matcher(record.get(0)).matches() || YEAR_PATTERN.matcher(record.get(3)).matches();
+    }
+    
+    /**
+     * Builds the listing object
+     * @param record
+     * @param provider
+     * @return 
+     */
+    public static Listing getListing(CSVRecord record, Provider provider) {
+        String[] makeModel = record.get(1).split("/");
+        Listing listing = new Listing.ListingBuilder().setCode(record.get(0))
+                                                      .setColor(record.get(4))
+                                                      .setKw(Integer.valueOf(record.get(2)))
+                                                      .setMake(makeModel[0])
+                                                      .setModel(makeModel[1])
+                                                      .setPrice(new BigDecimal(record.get(5)))
+                                                      .setProvider(provider)
+                                                      .setYear(Integer.valueOf(record.get(3))).build();
+        return listing;
+    }
+    
+    public static boolean validFileExtension(MultipartFile file) {
+        String extension = file.getOriginalFilename().split("\\.")[1];
+        return (null != extension && !extension.trim().isEmpty() && extension.trim().equals("csv"));
     }
 }

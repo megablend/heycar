@@ -20,6 +20,11 @@ public interface ListingService {
      * @param listings 
      */
     void saveListing(Provider provider, List<Listing> listings);
+    /**
+     * Save all listings
+     * @param listings 
+     */
+    void saveAll(List<Listing> listings);
     
     /**
      * Get Listing by code and provider

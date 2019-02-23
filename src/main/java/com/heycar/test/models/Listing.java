@@ -95,6 +95,74 @@ public class Listing implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date updatedAt;
     
+    private Listing(ListingBuilder builder) {
+        this.code = builder.code;
+        this.make = builder.make;
+        this.model = builder.model;
+        this.kw = builder.kw;
+        this.year = builder.year;
+        this.color = builder.color;
+        this.price = builder.price;
+        this.provider = builder.provider;
+    }
+    
+    public static class ListingBuilder {
+        private String code;
+        private String make;
+        private String model;
+        private int kw;
+        private int year;
+        private String color;
+        private BigDecimal price;
+        private Provider provider;
+        
+        public ListingBuilder() {}
+
+        public ListingBuilder setCode(String code) {
+            this.code = code;
+            return this;
+        }
+
+        public ListingBuilder setMake(String make) {
+            this.make = make;
+            return this;
+        }
+
+        public ListingBuilder setModel(String model) {
+            this.model = model;
+            return this;
+        }
+
+        public ListingBuilder setKw(int kw) {
+            this.kw = kw;
+            return this;
+        }
+
+        public ListingBuilder setYear(int year) {
+            this.year = year;
+            return this;
+        }
+
+        public ListingBuilder setColor(String color) {
+            this.color = color;
+            return this;
+        }
+
+        public ListingBuilder setPrice(BigDecimal price) {
+            this.price = price;
+            return this;
+        }
+
+        public ListingBuilder setProvider(Provider provider) {
+            this.provider = provider;
+            return this;
+        }
+        
+        public Listing build() {
+            return new Listing(this);
+        }
+    }
+    
     @PrePersist
     public void updateDate() {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
