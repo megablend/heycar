@@ -17,6 +17,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class ListingSearch {
     private String code;
+    private String make;
     private String model;
     private int kw;
     private int year;

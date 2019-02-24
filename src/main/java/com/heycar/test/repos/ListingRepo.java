@@ -22,7 +22,7 @@ public interface ListingRepo extends JpaRepository<Listing, Long>, JpaSpecificat
      * @param searchParameter
      * @return 
      */
-    @Query("SELECT new com.heycar.test.dto.ListingSearch(l.code, l.model, l.kw, l.year, l.color, l.price)"
-            + " FROM Listing l WHERE l.make LIKE %?1% OR l.model LIKE %?1% OR l.year LIKE %?1% OR l.color LIKE %?1%")
+    @Query("SELECT new com.heycar.test.dto.ListingSearch(l.code, l.make, l.model, l.kw, l.year, l.color, l.price)"
+            + " FROM Listing l WHERE l.make LIKE %?1% OR l.model LIKE %?1% OR CAST(l.year AS string) LIKE %?1% OR l.color LIKE %?1%")
     List<ListingSearch> getListingByParameter(String searchParameter);
 }

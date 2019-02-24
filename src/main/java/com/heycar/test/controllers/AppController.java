@@ -23,6 +23,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -60,12 +62,21 @@ public class AppController {
     @Autowired
     private FileProcessorService fileProcessorService;
     
+    /**
+     * Upload CSV for processing
+     * @param dealerId
+     * @param file
+     * @param providerName
+     * @return
+     * @throws Exception 
+     */
     @PostMapping("/upload_csv/{dealerId}")
     @ApiOperation(value = "Upload Listing in CSV Format", notes = "This endpoint manages the upload of listings by providers in CSV format", nickname = "Upload Vehicle Listings in CSV")
     public ResponseEntity uploadCsv(@PathVariable @Min(value = 1, message = "Dealer ID must not be less than one (1)") Long dealerId, 
-                                    @RequestParam("file") MultipartFile file, @RequestParam("provider") String providerName) throws Exception {
+                                    @RequestParam(value = "file", required = false) @NotNull(message = "Please upload the vehicles listing file") MultipartFile file, 
+                                    @RequestParam(value = "provider", required = false) @NotEmpty(message = "Please enter the provider for this listing") String providerName) throws Exception {
         // do some validation checks
-        if (null == file || file.isEmpty() || null == file.getOriginalFilename() || file.getOriginalFilename().trim().isEmpty()) 
+        if (file.isEmpty() || null == file.getOriginalFilename() || file.getOriginalFilename().trim().isEmpty()) 
             return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.NO_FILE_UPLOADED, "Please upload a CSV file")));
         
         if (!validFileExtension(file))

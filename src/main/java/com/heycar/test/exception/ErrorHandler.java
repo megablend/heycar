@@ -13,9 +13,11 @@ import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -36,6 +38,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
           errorDetails = new ErrorDetail(new Date(), "Invalid Parameter(s) Provided", errors);
       } else 
           errorDetails = new ErrorDetail(new Date(), ex.getMessage(), request.getDescription(false));
+//      log.error("An exception occurred: ", ex);
       return new ResponseEntity<>(errorDetails, HttpStatus.BAD_GATEWAY);
     }
 }

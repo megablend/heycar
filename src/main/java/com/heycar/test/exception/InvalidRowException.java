@@ -9,13 +9,13 @@ package com.heycar.test.exception;
  *
  * @author Megafu Charles <noniboycharsy@gmail.com>
  */
-public class UnableToPersistDataException extends Exception {
+public class InvalidRowException extends Exception {
     
-    public UnableToPersistDataException(String message, String entity) {
-        super(new StringBuilder(message).append(entity).toString());
+    public InvalidRowException(String message) {
+        super(message);
     }
     
-    public UnableToPersistDataException(Throwable t){
+    public InvalidRowException(Throwable t){
         super(t);
     }
 }

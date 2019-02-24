@@ -76,7 +76,7 @@ public final class Util {
      * @param record
      * @return 
      */
-    public static Listing getListing(CSVRecord record) {
+    public static Listing getListing(CSVRecord record, Provider provider) {
         String[] makeModel = record.get(1).split("/");
         Listing listing = new Listing.ListingBuilder().setCode(record.get(0))
                                                       .setColor(record.get(4))
@@ -84,6 +84,7 @@ public final class Util {
                                                       .setMake(makeModel[0])
                                                       .setModel(makeModel[1])
                                                       .setPrice(new BigDecimal(record.get(5)))
+                                                      .setProvider(provider)
                                                       .setYear(Integer.valueOf(record.get(3))).build();
         return listing;
     }

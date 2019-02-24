@@ -5,6 +5,7 @@
  */
 package com.heycar.test.service.impl;
 
+import com.heycar.test.exception.InvalidRowException;
 import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
 import com.heycar.test.service.FileProcessorService;
@@ -59,8 +60,11 @@ public class FileProcessorServiceImpl implements FileProcessorService {
                 if (isHeaderRow(record))
                     continue;
                 
+                if (record.size() != 6)
+                    throw new InvalidRowException(new StringBuilder("The row with code ").append(record.get(0)).append(" does not match the expected number of rows: 6").toString());
+                
                 // validate the records provided
-                Listing listing = getListing(record);
+                Listing listing = getListing(record, provider);
                 Set<ConstraintViolation<Listing>> violations = validator.validate(listing);
                 if (!violations.isEmpty())
                     throw new ConstraintViolationException(violations);
