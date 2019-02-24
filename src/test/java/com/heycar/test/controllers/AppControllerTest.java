@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -74,7 +75,7 @@ public class AppControllerTest {
     private String fileContent;
     
     @Before
-    public void setup() {
+    public void setup() { 
         try {
             mvc = MockMvcBuilders.webAppContextSetup(wac).build();
             fileContent = IOUtils.toString(this.getClass().getResourceAsStream("/textcsv.csv"), "UTF-8");
@@ -110,7 +111,7 @@ public class AppControllerTest {
                                                                         .param("provider", "Chevrolet Provider");
          
          MvcResult result = mvc.perform(requestBuilder)
-                            .andDo(print())
+//                            .andDo(print())
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                             .andExpect(jsonPath("$.responseCode", Matchers.is("00")))
@@ -146,7 +147,7 @@ public class AppControllerTest {
            }
          */
         mvc.perform(requestBuilder)
-            .andDo(print())
+//            .andDo(print())
             .andExpect(status().isBadGateway())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.timestamp", Matchers.notNullValue()))
@@ -168,7 +169,7 @@ public class AppControllerTest {
            }
          */
         mvc.perform(providerRequestBuilder)
-            .andDo(print())
+//            .andDo(print())
             .andExpect(status().isBadGateway())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.timestamp", Matchers.notNullValue()))
@@ -199,7 +200,7 @@ public class AppControllerTest {
            }
          */
         mvc.perform(requestBuilder)
-            .andDo(print())
+//            .andDo(print())
             .andExpect(status().isBadGateway())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
             .andExpect(jsonPath("$.timestamp", Matchers.notNullValue()))
@@ -233,7 +234,7 @@ public class AppControllerTest {
                                                                         .param("provider", "Chevrolet Provider");
          
          MvcResult result = mvc.perform(requestBuilder)
-                            .andDo(print())
+//                            .andDo(print())
                             .andExpect(status().isBadRequest())
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                             .andExpect(jsonPath("$.responseCode", Matchers.is("01")))
@@ -270,7 +271,7 @@ public class AppControllerTest {
                                                                         .param("provider", "Chevrolet Provider");
          
          MvcResult result = mvc.perform(requestBuilder)
-                            .andDo(print())
+//                            .andDo(print())
                             .andExpect(status().isBadRequest())
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                             .andExpect(jsonPath("$.responseCode", Matchers.is("02")))
@@ -302,12 +303,94 @@ public class AppControllerTest {
                                                                         .param("provider", "Chevrolet Provider");
          
          mvc.perform(requestBuilder)
-            .andDo(print())
+//            .andDo(print())
             .andExpect(status().isBadGateway());
          
          // verify that the services are called
          verify(dealerService, times(1)).findDealerById(any());
          verify(providerService, times(1)).getByProviderNameAndDealer(any(), any());
          verify(fileProcessorService, times(1)).processFile(any(), any());
+    }
+    
+    /**
+     * Send valid listings via the API
+     * @throws Exception 
+     */
+    @Test
+    public void uploadListing_withValidRequest_thenReturnOk() throws Exception {
+        
+        /**
+         * {
+                "responseCode": "00",
+                "responseMessage": "Listings successfully saved"
+           }
+         */
+        String res = "{\"responseCode\":\"00\",\"responseMessage\":\"Listings successfully saved\"}";
+        
+        /**
+         * {
+                    "dealer": 1,
+                    "provider": "Chevrolet Provider",
+                    "listings": [
+                            {
+                                    "code": "a",
+                                    "make": "renault",
+                                    "model": "megane",
+                                    "kW": 132,
+                                    "year": 2014,
+                                    "color": "red",
+                                    "price": 13990
+                            }
+                    ]
+           }
+         */
+        String requestStr = "{ \"dealer\": 1, \"provider\": \"Chevrolet Provider\", \"listings\": [ { \"code\": \"a\", \"make\": \"renault\", \"model\": \"megane\", \"kW\": 132, \"year\": 2014, \"color\": \"red\", \"price\": 13990 } ] }";
+        // mock depednencies
+        when(dealerService.findDealerById(any())).thenReturn(new Dealer());
+        when(providerService.getByProviderNameAndDealer(any(), any())).thenReturn(new Provider());
+        when(appProperties.getMaximumNumberOfListings()).thenReturn(10);
+        doNothing().when(queueService).sendToTopic(any(), any());
+        
+        MvcResult result = mvc.perform(post("/vehicle_listings")
+                            .contentType(MediaType.APPLICATION_JSON)
+//                            .accept(MediaType.APPLICATION_JSON)
+                            .content(requestStr))
+//                            .andDo(print())
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                            .andExpect(jsonPath("$.responseCode", Matchers.is("00")))
+                            .andExpect(jsonPath("$.responseMessage", Matchers.is("Listings successfully saved"))).andReturn();
+        
+        verify(dealerService, times(1)).findDealerById(any());
+        verify(providerService, times(1)).getByProviderNameAndDealer(any(), any());
+        verify(appProperties, times(1)).getMaximumNumberOfListings();
+        verify(queueService, times(1)).sendToTopic(any(), any());
+        assertEquals(result.getResponse().getContentAsString(), res);
+    }
+    
+    /**
+     * Test case for API invalid request
+     * @throws Exception 
+     */
+    @Test
+    public void uploadListing_withInvalidRequest_thenReturnBadGateway() throws Exception {
+        /**
+         * {
+                    "dealer": 1,
+                    "provider": "Chevrolet Provider",
+                    "listings": []
+           }
+         */
+        String requestStr = "{ \"dealer\": 1, \"provider\": \"Chevrolet Provider\", \"listings\": [] }";
+        
+        mvc.perform(post("/vehicle_listings")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestStr))
+//            .andDo(print())
+            .andExpect(status().isBadGateway())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(jsonPath("$.timestamp", Matchers.notNullValue()))
+            .andExpect(jsonPath("$.message", Matchers.is("Invalid Parameter(s) Provided")))
+            .andExpect(jsonPath("$.details[0]", Matchers.is("[], Invalid listings provided")));
     }
 }
