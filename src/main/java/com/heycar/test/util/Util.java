@@ -72,9 +72,8 @@ public final class Util {
     }
     
     /**
-     * Builds the listing object
+     * Builds a Listing object
      * @param record
-     * @param provider
      * @return 
      */
     public static Listing getListing(CSVRecord record) {

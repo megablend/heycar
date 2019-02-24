@@ -5,6 +5,7 @@
  */
 package com.heycar.test.service;
 
+import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
 import java.util.List;
@@ -38,4 +39,11 @@ public interface ListingService {
      * @return 
      */
     List<Listing> getAllListings();
+    
+    /**
+     * Search by a selected query parameter
+     * @param searchParameter
+     * @return 
+     */
+    List<ListingSearch> searchByQueryParameter(String searchParameter);
 }

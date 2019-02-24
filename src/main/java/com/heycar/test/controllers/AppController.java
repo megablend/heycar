@@ -68,7 +68,7 @@ public class AppController {
             return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.NO_FILE_UPLOADED, "Please upload a CSV file")));
         
         if (!validFileExtension(file))
-            return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.NO_FILE_UPLOADED, "Please upload a CSV file")));
+            return ResponseEntity.badRequest().body(ResponseFactory.createResponse(new ApiResponseFactory(Responses.NO_FILE_UPLOADED, "The file must be in .csv format")));
         
         // check if this provider and dealer exists
         Dealer dealer = dealerService.findDealerById(dealerId);
@@ -111,12 +111,16 @@ public class AppController {
     
     
     /**
-     * Show all listings
+     * Show listing by queries
+     * @param query {optional} -  required for searching specific parameters
      * @return 
      */
     @GetMapping("/search")
     @ApiOperation(value = "Show All Listings", notes = "This endpoint shows all listings", nickname = "Show all listings")
-    public ResponseEntity showAllListing() {
-        return ResponseEntity.ok(listingService.getAllListings());
+    public ResponseEntity showAllListing(@RequestParam(value = "fullQuery", required = false) String query) {
+        if (null == query)
+            return ResponseEntity.ok(listingService.getAllListings());
+        else 
+            return ResponseEntity.ok(listingService.searchByQueryParameter(query));
     }
 }

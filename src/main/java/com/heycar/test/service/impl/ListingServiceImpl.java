@@ -5,6 +5,7 @@
  */
 package com.heycar.test.service.impl;
 
+import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.dto.SearchCriteria;
 import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
@@ -89,6 +90,12 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public void saveAll(List<Listing> listings) {
         listingRepo.saveAll(listings);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<ListingSearch> searchByQueryParameter(String searchParameter) {
+        return listingRepo.getListingByParameter(searchParameter);
     }
     
 }

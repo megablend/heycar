@@ -11,4 +11,5 @@ package com.heycar.test.dto;
  */
 public interface SearchCriteriaOperation {
     String EQUAL_OPERATION = ":";
+    String LIKE_OPERATION = "LIKE";
 }

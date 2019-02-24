@@ -5,8 +5,10 @@
  */
 package com.heycar.test.service.impl;
 
+import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.dto.SearchCriteria;
 import com.heycar.test.dto.SearchCriteriaOperation;
+import com.heycar.test.models.Listing;
 import com.heycar.test.service.QuerySpecification;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -25,8 +27,10 @@ public class QuerySpecificationImpl implements QuerySpecification {
     @Override
     public Specification<? extends Object> buildQuery(SearchCriteria criteria) {
         return (Root<Object> root, CriteriaQuery<?> cq, CriteriaBuilder cb) -> {
+            // handles equals operation
             if (criteria.getOperation().equals(SearchCriteriaOperation.EQUAL_OPERATION))
                 return cb.equal(root.get(criteria.getKey()), criteria.getValue());
+            
             return null;
         };
     }
