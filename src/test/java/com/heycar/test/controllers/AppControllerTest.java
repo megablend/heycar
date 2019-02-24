@@ -6,8 +6,10 @@
 package com.heycar.test.controllers;
 
 import com.heycar.test.config.ApplicationProperties;
+import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.exception.InvalidRowException;
 import com.heycar.test.models.Dealer;
+import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
 import com.heycar.test.service.DealerService;
 import com.heycar.test.service.FileProcessorService;
@@ -15,6 +17,9 @@ import com.heycar.test.service.ListingService;
 import com.heycar.test.service.ProviderService;
 import com.heycar.test.service.QueueService;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +43,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -455,5 +461,70 @@ public class AppControllerTest {
         verify(providerService, times(1)).getByProviderNameAndDealer(any(), any());
         verify(appProperties, times(2)).getMaximumNumberOfListings();
         assertEquals(result.getResponse().getContentAsString(), res);
+    }
+    
+    /**
+     * Test case for show all listings
+     * @throws Exception 
+     */
+    @Test
+    public void showAllListing_whenAll_thenReturnOk() throws Exception {
+        // mock dependencies
+        when(listingService.getAllListings()).thenReturn(mockListings());
+        
+        mvc.perform(get("/search")
+                            .contentType(MediaType.APPLICATION_JSON))
+                            .andDo(print())
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                            .andExpect(jsonPath("$.[0].code", Matchers.is("a")))
+                            .andExpect(jsonPath("$.[0].model", Matchers.is("e300")));
+        
+    }
+    
+    /**
+     * Test Case for Search Filter
+     * @throws Exception 
+     */
+    @Test
+    public void showAllListing_whenSearchQuery_thenReturnOk() throws Exception {
+        // mock dependencies
+        when(listingService.searchByQueryParameter(any())).thenReturn(mockListingSearch());
+        
+        mvc.perform(get("/search?fullQuery=zzzz")
+                            .contentType(MediaType.APPLICATION_JSON))
+                            .andDo(print())
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                            .andExpect(jsonPath("$.[0].code", Matchers.is("bb")))
+                            .andExpect(jsonPath("$.[0].make", Matchers.is("volks")));
+    }
+    
+    /**
+     * Mock Listings
+     * @return 
+     */
+    private List<Listing> mockListings() {
+        List<Listing> listings = new ArrayList<>();
+        Listing listing1 = new Listing.ListingBuilder().setCode("a")
+                                                       .setColor("red")
+                                                       .setKw(123)
+                                                       .setMake("mercedes")
+                                                       .setModel("e300")
+                                                       .setPrice(new BigDecimal(1000))
+                                                       .setYear(2015).build();
+        listings.add(listing1);
+        return listings;
+    }
+    
+    /**
+     * Mock Listing Search 
+     * @return 
+     */
+    private List<ListingSearch> mockListingSearch() {
+        List<ListingSearch> listings = new ArrayList<>();
+        ListingSearch listing = new ListingSearch("bb", "volks", "passat", 28, 2016, "red", new BigDecimal(5000));
+        listings.add(listing);
+        return listings;
     }
 }
