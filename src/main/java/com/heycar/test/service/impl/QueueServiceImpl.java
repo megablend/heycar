@@ -8,12 +8,15 @@ package com.heycar.test.service.impl;
 import com.heycar.test.config.ApplicationProperties;
 import com.heycar.test.dto.ListingRequest;
 import com.heycar.test.models.Dealer;
+import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
 import com.heycar.test.service.DealerService;
 import com.heycar.test.service.ListingService;
 import com.heycar.test.service.ProviderService;
 import com.heycar.test.service.QueueService;
 import com.heycar.test.util.Util;
+import java.util.List;
+import static java.util.stream.Collectors.toList;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +52,7 @@ public class QueueServiceImpl implements QueueService {
     /** {@inheritDoc} */
     @Override
     public void sendToTopic(String topic, String payload) {
-        log.trace("Received payload for topic {} \n: {}", topic, payload);
+//        log.info("Received payload for topic {} \n: {}", topic, payload);
         jmsTemplate.send(topic, (Session session) -> {
             TextMessage textMessage = session.createTextMessage(payload);
             textMessage.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, properties.getActivemqMessageDeliveryRetrial() * 60 * 1000); // failed message delivery will repeat within the specified minutes configured
@@ -64,8 +67,21 @@ public class QueueServiceImpl implements QueueService {
         ListingRequest request = Util.convertStringToObject(payload, ListingRequest.class);
         Dealer dealer = dealerService.findDealerById(request.getDealer());
         Provider provider = providerService.getByProviderNameAndDealer(dealer, request.getProvider());
+        
         // save or update listing
-        listingService.saveListing(provider, request.getListings());
+        List<Listing> listings = request.getListings().stream().map((l) -> {
+            Listing listing = new Listing.ListingBuilder().setCode(l.getCode())
+                                                          .setColor(l.getColor())
+                                                          .setKw(l.getKW())
+                                                          .setMake(l.getMake())
+                                                          .setModel(l.getModel())
+                                                          .setPrice(l.getPrice())
+                                                          .setYear(l.getYear())
+                                                          .setProvider(provider).build();
+            return listing;
+        }).collect(toList());
+        
+        listingService.saveListing(provider, listings);
     }
     
 }

@@ -26,6 +26,7 @@ import javax.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,13 +85,15 @@ public class AppController {
     }
     
     /**
-     * Saves a dealer's listings
+     * Saves dealers listings
      * @param request
+     * @param result
      * @return 
      */
     @PostMapping("/vehicle_listings")
     @ApiOperation(value = "Upload Listing", notes = "This endpoint manages the upload of listings by providers", nickname = "Upload Vehicle Listings")
-    public ResponseEntity uploadListing(@Valid @RequestBody ListingRequest request) {
+    public ResponseEntity uploadListing(@Valid @RequestBody ListingRequest request, BindingResult result) {
+        
         // check if this provider and dealer exists
         Dealer dealer = dealerService.findDealerById(request.getDealer());
         

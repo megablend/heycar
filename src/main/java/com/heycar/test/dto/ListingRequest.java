@@ -5,10 +5,10 @@
  */
 package com.heycar.test.dto;
 
-import com.heycar.test.models.Listing;
 import java.util.List;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +25,6 @@ public class ListingRequest {
     private Long dealer;
     @NotBlank(message = "Please provide the provider for this listing")
     private String provider;
-    @NotBlank(message = "Invalid collection of listings provided")
-    private List<Listing> listings;
+    @NotEmpty(message = "Invalid listings provided")
+    private List<ListingDto> listings;
 }

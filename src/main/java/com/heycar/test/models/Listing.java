@@ -24,10 +24,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -55,31 +51,24 @@ public class Listing implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Pattern(regexp = "[a-zA-Z0-9]+", message = "Please provide a valid listing code")
     @Column(name = "code", length = 10)
     private String code;
     
-    @Pattern(regexp = "[a-zA-Z0-9\\-, ]+", message = "Please provide a valid vehicle make")
     @Column(name = "make", length = 50)
     private String make;
     
-    @NotBlank(message = "Please provide the vehicle model")
     @Column(name = "model", length = 50)
     private String model;
     
-    @Min(value = 1, message = "The power in PS must not be less than one (1)")
     @Column(name = "power_in_ps", length = 10)
     private int kw;
     
-    @Pattern(regexp = "^\\d{4}$", message = "Please provide a valid year")
     @Column(name = "model_year", length = 4)
     private int year;
     
-    @Pattern(regexp = "[a-zA-Z\\- ]+", message = "Please provide a valid color")
     @Column(name = "color", length = 50)
     private String color;
     
-    @NotNull(message = "Please provide the price for this listing")
     @Column(name = "price")
     private BigDecimal price;
     

@@ -43,12 +43,12 @@ public class ListingServiceImpl implements ListingService {
             ArrayList<Listing> listingsToSave = new ArrayList<>();
             listings.parallelStream().forEach((l) -> {
                 Listing listing = getListingByCodeAndProvider(l.getCode(), provider);
-                if (null == listing) {
-                    l.setProvider(provider);
+                
+                if (null == listing)
                     listingsToSave.add(l);
-                } else {
+                else 
                     listingsToSave.add(updateListing(listing, l));
-                }
+                
             });
             saveAll(listingsToSave); // save all at once
         } catch (Exception e) {
