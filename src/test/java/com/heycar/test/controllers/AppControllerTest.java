@@ -393,4 +393,67 @@ public class AppControllerTest {
             .andExpect(jsonPath("$.message", Matchers.is("Invalid Parameter(s) Provided")))
             .andExpect(jsonPath("$.details[0]", Matchers.is("[], Invalid listings provided")));
     }
+    
+    /**
+     * Test case for maximum listing limit
+     * @throws Exception 
+     */
+    @Test
+    public void uploadListing_whenLimitExceeded_thenReturnBadRequest() throws Exception {
+        
+        /**
+         * {
+                "responseCode": "04",
+                "responseMessage": "Listings successfully saved"
+           }
+         */
+        String res = "{\"responseCode\":\"04\",\"responseMessage\":\"You have exceeded the maximum allowable number of listings per request:  1\"}";
+        
+        /**
+         * {
+                    "dealer": 1,
+                    "provider": "Chevrolet Provider",
+                    "listings": [
+                            {
+                                    "code": "a",
+                                    "make": "renault",
+                                    "model": "megane",
+                                    "kW": 132,
+                                    "year": 2014,
+                                    "color": "red",
+                                    "price": 13990
+                            },
+                            {
+                                    "code": "abb",
+                                    "make": "renault",
+                                    "model": "megane",
+                                    "kW": 132,
+                                    "year": 2014,
+                                    "color": "red",
+                                    "price": 13990
+                            }
+                    ]
+           }
+         */
+        String requestStr = "{ \"dealer\": 1, \"provider\": \"Chevrolet Provider\", \"listings\": [ { \"code\": \"a\", \"make\": \"renault\", \"model\": \"megane\", \"kW\": 132, \"year\": 2014, \"color\": \"red\", \"price\": 13990 }, { \"code\": \"abb\", \"make\": \"renault\", \"model\": \"megane\", \"kW\": 132, \"year\": 2014, \"color\": \"red\", \"price\": 13990 } ] }";
+        
+        // mock depednencies
+        when(dealerService.findDealerById(any())).thenReturn(new Dealer());
+        when(providerService.getByProviderNameAndDealer(any(), any())).thenReturn(new Provider());
+        when(appProperties.getMaximumNumberOfListings()).thenReturn(1);
+        
+        MvcResult result = mvc.perform(post("/vehicle_listings")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestStr))
+                            .andDo(print())
+                            .andExpect(status().isBadRequest())
+                            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                            .andExpect(jsonPath("$.responseCode", Matchers.is("04")))
+                            .andExpect(jsonPath("$.responseMessage", Matchers.is("You have exceeded the maximum allowable number of listings per request:  1"))).andReturn();
+        
+        verify(dealerService, times(1)).findDealerById(any());
+        verify(providerService, times(1)).getByProviderNameAndDealer(any(), any());
+        verify(appProperties, times(2)).getMaximumNumberOfListings();
+        assertEquals(result.getResponse().getContentAsString(), res);
+    }
 }
