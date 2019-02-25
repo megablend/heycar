@@ -451,7 +451,7 @@ public class AppControllerTest {
         MvcResult result = mvc.perform(post("/vehicle_listings")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestStr))
-                            .andDo(print())
+//                            .andDo(print())
                             .andExpect(status().isBadRequest())
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                             .andExpect(jsonPath("$.responseCode", Matchers.is("04")))
@@ -474,7 +474,7 @@ public class AppControllerTest {
         
         mvc.perform(get("/search")
                             .contentType(MediaType.APPLICATION_JSON))
-                            .andDo(print())
+//                            .andDo(print())
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                             .andExpect(jsonPath("$.[0].code", Matchers.is("a")))
@@ -493,7 +493,7 @@ public class AppControllerTest {
         
         mvc.perform(get("/search?fullQuery=zzzz")
                             .contentType(MediaType.APPLICATION_JSON))
-                            .andDo(print())
+//                            .andDo(print())
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                             .andExpect(jsonPath("$.[0].code", Matchers.is("bb")))
