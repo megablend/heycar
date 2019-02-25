@@ -28,7 +28,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -66,7 +65,7 @@ public class FileProcessorServiceImpl implements FileProcessorService {
                 // validate the records provided
                 Listing listing = getListing(record, provider);
                 Set<ConstraintViolation<Listing>> violations = validator.validate(listing);
-                if (!violations.isEmpty())
+                if (null != violations && !violations.isEmpty())
                     throw new ConstraintViolationException(violations);
                 listings.add(listing);
             }

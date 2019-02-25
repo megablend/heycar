@@ -11,6 +11,7 @@ import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -70,7 +71,7 @@ public final class Util {
     }
     
     public static Provider stubProvider() {
-        return new Provider(1L, new Dealer(1L, "Benz", null, null), "Benz Provider", null, null);
+        return new Provider(1L, new Dealer(1L, "Benz", new Date(), new Date()), "Benz Provider", new Date(), new Date());
     }
     
     public static Specification<Listing> stubListingSpecification() {
