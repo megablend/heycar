@@ -5,8 +5,8 @@
  */
 package com.heycar.test.services;
 
-import static com.heycar.test.Util.stubProvider;
-import static com.heycar.test.Util.stubProviderSpecification;
+import static com.heycar.test.utils.Util.stubProvider;
+import static com.heycar.test.utils.Util.stubProviderSpecification;
 import com.heycar.test.models.Dealer;
 import com.heycar.test.models.Provider;
 import com.heycar.test.repos.ProviderRepo;

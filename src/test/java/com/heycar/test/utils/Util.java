@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.heycar.test;
+package com.heycar.test.utils;
 
 import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.models.Dealer;

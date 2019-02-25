@@ -5,8 +5,8 @@
  */
 package com.heycar.test.controllers;
 
-import static com.heycar.test.Util.mockListingSearch;
-import static com.heycar.test.Util.mockListings;
+import static com.heycar.test.utils.Util.mockListingSearch;
+import static com.heycar.test.utils.Util.mockListings;
 import com.heycar.test.config.ApplicationProperties;
 import com.heycar.test.exception.InvalidRowException;
 import com.heycar.test.models.Dealer;

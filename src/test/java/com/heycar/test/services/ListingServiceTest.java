@@ -5,10 +5,10 @@
  */
 package com.heycar.test.services;
 
-import static com.heycar.test.Util.mockListing;
-import static com.heycar.test.Util.mockListingSearch;
-import static com.heycar.test.Util.mockListings;
-import static com.heycar.test.Util.stubListingSpecification;
+import static com.heycar.test.utils.Util.mockListing;
+import static com.heycar.test.utils.Util.mockListingSearch;
+import static com.heycar.test.utils.Util.mockListings;
+import static com.heycar.test.utils.Util.stubListingSpecification;
 import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
@@ -87,6 +87,10 @@ public class ListingServiceTest {
         assertThat(listings.size(), is(mockListings().size())); // confirm that the sizes are the same
     }
     
+    /**
+     * Test case for searching listing
+     * @throws Exception 
+     */
     @Test
     public void searchByQueryParameter_whenSearchParameter_thenReturnListingSearch() throws Exception {
         when(listingRepo.getListingByParameter(any())).thenReturn(mockListingSearch());
