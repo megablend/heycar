@@ -5,11 +5,11 @@
  */
 package com.heycar.test.controllers;
 
+import static com.heycar.test.Util.mockListingSearch;
+import static com.heycar.test.Util.mockListings;
 import com.heycar.test.config.ApplicationProperties;
-import com.heycar.test.dto.ListingSearch;
 import com.heycar.test.exception.InvalidRowException;
 import com.heycar.test.models.Dealer;
-import com.heycar.test.models.Listing;
 import com.heycar.test.models.Provider;
 import com.heycar.test.service.DealerService;
 import com.heycar.test.service.FileProcessorService;
@@ -17,9 +17,6 @@ import com.heycar.test.service.ListingService;
 import com.heycar.test.service.ProviderService;
 import com.heycar.test.service.QueueService;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +42,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -499,32 +495,5 @@ public class AppControllerTest {
                             .andExpect(jsonPath("$.[0].code", Matchers.is("bb")))
                             .andExpect(jsonPath("$.[0].make", Matchers.is("volks")));
     }
-    
-    /**
-     * Mock Listings
-     * @return 
-     */
-    private List<Listing> mockListings() {
-        List<Listing> listings = new ArrayList<>();
-        Listing listing1 = new Listing.ListingBuilder().setCode("a")
-                                                       .setColor("red")
-                                                       .setKw(123)
-                                                       .setMake("mercedes")
-                                                       .setModel("e300")
-                                                       .setPrice(new BigDecimal(1000))
-                                                       .setYear(2015).build();
-        listings.add(listing1);
-        return listings;
-    }
-    
-    /**
-     * Mock Listing Search 
-     * @return 
-     */
-    private List<ListingSearch> mockListingSearch() {
-        List<ListingSearch> listings = new ArrayList<>();
-        ListingSearch listing = new ListingSearch("bb", "volks", "passat", 28, 2016, "red", new BigDecimal(5000));
-        listings.add(listing);
-        return listings;
-    }
+   
 }

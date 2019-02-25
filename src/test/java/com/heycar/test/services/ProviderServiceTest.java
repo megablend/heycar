@@ -5,6 +5,8 @@
  */
 package com.heycar.test.services;
 
+import static com.heycar.test.Util.stubProvider;
+import static com.heycar.test.Util.stubProviderSpecification;
 import com.heycar.test.models.Dealer;
 import com.heycar.test.models.Provider;
 import com.heycar.test.repos.ProviderRepo;
@@ -12,9 +14,6 @@ import com.heycar.test.service.ProviderService;
 import com.heycar.test.service.QuerySpecification;
 import com.heycar.test.service.impl.ProviderServiceImpl;
 import java.util.Optional;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -60,15 +59,5 @@ public class ProviderServiceTest {
         assertEquals("Benz", provider.getDealer().getName());
         assertEquals(provider.getName(), stubProvider().getName());
         assertThat(provider.getId(), is(1L));
-    }
-    
-    public Specification<Provider> stubProviderSpecification() {
-        return (Root<Provider> root, CriteriaQuery<?> cq, CriteriaBuilder cb) -> {
-            return cb.equal(root.get("key"), "value");
-        };
-    }
-    
-    public Provider stubProvider() {
-        return new Provider(1L, new Dealer(1L, "Benz", null, null), "Benz Provider", null, null);
     }
 }
